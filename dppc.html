@@ -195,6 +195,10 @@
     </div>
 
 <script>
+    //about, services, mission, contact
+    let windowY = [0,0,0,0];
+
+    
     // 1. HIGHLIGHT FUNCTION (Scrollspy Logic)
     function updateActiveButton(id) {
         document.querySelectorAll('.button-81').forEach(btn => btn.classList.remove('active'));
@@ -204,11 +208,13 @@
 
     // 2. SCROLL TO FUNCTION
     function scrollToSection(id) {
+
+
         const section = document.getElementById(id);
         if (!section) return;
-
         section.scrollIntoView({
-            behavior: 'smooth'
+            behavior: 'smooth',
+            block: 'center'
         });
         updateActiveButton(id);
 
@@ -236,6 +242,13 @@
                 text.classList.add("mission-animate");
             });
         }
+        if (id === "contact") {
+            document.querySelectorAll(".content-box").forEach(text => {
+                text.classList.remove("contact-animate");
+                void text.offsetWidth;
+                text.classList.add("contact-animate");
+            });
+        }
     }
 
     /* === SCROLL OBSERVER (ONLY FIXED PART) === */
@@ -246,42 +259,106 @@
     };
 
     const animateOnScroll = (entries) => {
+        // console.log(window.scrollY)
+
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 const section = entry.target;
                 const id = section.id;
 
                 // highlight
-                updateActiveButton(id);
 
                 // KEEP ALL YOUR ORIGINAL ANIMATIONS
                 if (id === "services") {
                     const grid = section.querySelector(".services-grid");
                     grid.classList.add("zoom-active");
+                    windowY[1] = window.scrollY;
+                    // console.log("services");
                 }
                 if (id === "mission") {
                     const missionTexts = section.querySelectorAll(".mission-text");
                     missionTexts.forEach(text => text.classList.add("mission-animate"));
+                    windowY[2] = window.scrollY;
+                    // console.log("mission");
                 }
                 if (id === "about") {
                     const cardTexts = section.querySelectorAll(".about-text");
                     cardTexts.forEach(text => text.classList.add("about-animate"));
+                    windowY[0] = window.scrollY;
+                    // console.log("about");
                 }
+                if (id === "contact") {
+                    const cardTexts = section.querySelectorAll(".content-box");
+                    cardTexts.forEach(text => text.classList.add("contact-animate"));
+                    windowY[3] = window.scrollY;
+                    // console.log("contact");
+                }
+                // console.log(windowY);
+                // updateActiveButton(id);
             }
+
         });
+
     };
+    function getCenter() 
+    {
+        const sections = document.querySelectorAll("section");
+        const viewportCenter = window.innerHeight / 2;
+        let centerSection = null;
+        sections.forEach(section => {
+        const area = section.getBoundingClientRect();
+        if (area.top <= viewportCenter && area.bottom >= viewportCenter) 
+        {
+            centerSection = section;
+        }
+        });
+        return centerSection;
+
+    }
+
 
     const observer = new IntersectionObserver(animateOnScroll, observerOptions);
     document.querySelectorAll("section").forEach(sec => observer.observe(sec));
-
-    /* ✅ ONLY ADDITION: CONTACT FIX */
+     /* ✅ ONLY ADDITION: CONTACT FIX */
     window.addEventListener("scroll", () => {
-        const contact = document.getElementById("contact");
-        const rect = contact.getBoundingClientRect();
+        const current = getCenter();
+        if(current)
+        {
+            // console.log(current.id);
 
-        if (rect.top < window.innerHeight && rect.bottom <= window.innerHeight) {
-            updateActiveButton("contact");
+            // if(current.id == "about")
+            // {
+            //     updateActiveButton("about");
+            // }
+            // else if(current.id == "services")
+            // {
+            //     updateActiveButton("services");
+            // }
+            // else if(current.id == "mission")
+            // {
+            //     updateActiveButton("mission");
+            // }
+            // else if(current.id == "contact")
+            // {
+            //     updateActiveButton("contact");
+            // }
+            switch(current.id)
+            {
+                case "about":
+                    updateActiveButton("about");
+                    break;
+                case "services":
+                    updateActiveButton("services");
+                    break;
+                case "mission":
+                    updateActiveButton("mission");
+                    break;
+                case "contact":
+                    updateActiveButton("contact");
+            }
         }
+
+
     });
 
     /* IMAGE ROTATION (UNCHANGED) */
